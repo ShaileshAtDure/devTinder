@@ -4,26 +4,12 @@ const connectDB = require("./config/database");
 const app = express();
 const User = require("./models/user");
 
+app.use(express.json());
+
 app.post("/signup", async (req, res) => {
-  const userObject = {
-    firstName: "Akshay",
-    lastName: "Saini",
-    emailId: "Akshay.saini@in",
-    password: "Akshay123",
-  };
+  //  Creating a new instance of the User model
 
-  // Creating a new instance of the User model
-  //   const user = new User({
-  //     firstName: "Shailesh",
-  //     lastName: "Sangle",
-  //     emailId: "shailesh.sangle@in",
-  //     password: "shailesh123",
-  //   });
-
-  const user = new User(userObject);
-
-  // Most of the mongoose function return a promise so need to use async await
-  // whenever you are doing some DB operation always wrap inside try and catch block
+  const user = new User(req.body);
   try {
     await user.save();
     res.send("User Added successfully!!");
