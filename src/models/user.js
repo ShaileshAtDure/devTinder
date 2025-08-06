@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
   {
@@ -78,6 +80,29 @@ const userSchema = new mongoose.Schema(
     timestamps: true, // USing this created and updated field add in your database without any extra payload
   }
 );
+
+// Do not use arrow function because arrow function does not have access to this keyword
+userSchema.methods.getJWT = async function () {
+  const user = this; // Here this represent to that particular instance of the user
+  const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$790", {
+    expiresIn: "7d",
+  });
+
+  return token;
+};
+
+userSchema.methods.validatePassword = async function (passwordInputByUser) {
+  const user = this;
+
+  const passwordHash = user.password;
+
+  const isPasswordValid = await bcrypt.compare(
+    passwordInputByUser,
+    passwordHash
+  ); // If you interchange this sequence then it is not working
+
+  return isPasswordValid;
+};
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;
