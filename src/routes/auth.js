@@ -71,4 +71,13 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
+authRouter.post("/logout", async (req, res) => {
+  // We not write in a try catch block because here we only remove cookie and send the response so not eed to handle any error
+  res
+    .cookie("token", null, {
+      expires: new Date(Date.now()),
+    })
+    .send("Logout Successfully!!");
+});
+
 module.exports = authRouter;
