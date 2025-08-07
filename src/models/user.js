@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
     firstName: {
       type: String,
       required: true,
+      index: true, // make query more search faster
       minLength: 4,
       maxLength: 50,
     },
@@ -19,7 +20,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       lowercase: true,
       required: true,
-      unique: true,
+      unique: true, // When you make field unique then mangoDB automatically add index on that field
       trim: true,
       validator(value) {
         if (!validator.isEmail(value)) {
@@ -43,6 +44,12 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
+      // Using enum
+      // enum: {
+      //   values: ["male", "female", "others"],
+      //   message: `{VALUE} is not a valid gender type`,
+      // },
+
       // As soon as data is put in the databse this valiadation will be run and value is pass to the database it first go throught this validation function if this validation does not throw any error then this value will be saved in the database otherwise database will not be updated and error will be thrown
 
       // By default this validate method only call when the new document is created. suppose existing data is there and you update that data then its not go through this validation function
