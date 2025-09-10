@@ -130,3 +130,10 @@
 - What is the advantages and disadvantage of creating index ?
 - Read this article about compond indexes - https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/
 - ALWAYS THINK ABOUT CORNER CASES IF YOU LEAVE CORNER CASES THEN ATTACKER CAN ATTACK YOUR CORNER CASES AND DISTROY YOUR DATA.
+
+# Video 26 Homework
+
+- Write code with proper validations for POST POST /request/review/:status/:requestId API
+- Thought process - POST vs GET
+- Read about ref and populate https://mongoosejs.com/docs/populate.html
+- Create GET /user/requests/received with all the checks
