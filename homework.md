@@ -137,3 +137,24 @@
 - Thought process - POST vs GET
 - Read about ref and populate https://mongoosejs.com/docs/populate.html
 - Create GET /user/requests/received with all the checks
+
+# Video 27 Homework
+
+- Logic for GET /feed API
+- Explore the $nin, $and and other query operators
+- pagination
+
+NOTES :
+
+/feed?page=1&limit=10 => 1-10 first 10 users .skip(0) & .limit(10)
+
+/feed?page=2&limit=10 => 11-20 .skip(10) & .limit(10)
+
+/feed?page=3&limit=10 => 21-30 .skip(20) & .limit(10)
+
+.skip() & .limit() => two important function in mongo DB for pagination
+
+skip = (page-1)\*limit;
+
+/feed/:id => id is a param
+/feed?page=1&limit=10 => page and limit is query

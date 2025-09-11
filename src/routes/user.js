@@ -3,6 +3,7 @@ const userRouter = express.Router();
 
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
+const User = require("../models/user");
 
 const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
 
@@ -100,6 +101,93 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
     res.json({ data });
   } catch (err) {
     res.status(400).send({ message: err.message });
+  }
+});
+
+userRouter.get("/feed", userAuth, async (req, res) => {
+  try {
+    // User should see all the user cards except
+    // 0. his own card
+    // 1. his connections
+    // 2. ignored people
+    // 3. already sent the connection request
+
+    // Example : Rahul = [Mark, Donald, MS Dhoni, Virat]
+    // R --> Akshay --> Rejected R --> Elon --> Accepted
+    // Elon = [Akshay, Mark, Donald, MS Dhoni, Virat] // Elone see this feed.
+    // Akshay = [Elon, Mark, Donald, MS Dhoni, Virat] // Akshay see this feed.
+
+    const loggedInUser = req.user;
+
+    const page = parseInt(req.query.page) || 1; // page number not a problem with attacker attack
+    let limit = parseInt(req.query.limit) || 10; // limit have a problem when attacker attack
+    limit = limit > 50 ? 50 : limit; // do not understand these logic
+    const skip = (page - 1) * limit;
+
+    // Find all connection request
+    const connectionRequests = await ConnectionRequest.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select("fromUserId toUserId");
+
+    const hideUsersFromFeed = new Set();
+
+    console.log("connectionRequests", connectionRequests);
+
+    // connectionRequests = [
+    //   {
+    //     _id: new ObjectId("68c13d5b1ceb905debf71e02"),
+    //     fromUserId: new ObjectId("68c13bcc1ceb905debf71ded"),
+    //     toUserId: new ObjectId("68c13ccb1ceb905debf71df7"),
+    //   },
+    //   {
+    //     _id: new ObjectId("68c13da9b1ecdd4de5a49c38"),
+    //     fromUserId: new ObjectId("68c13c0f1ceb905debf71def"),
+    //     toUserId: new ObjectId("68c13ccb1ceb905debf71df7"),
+    //   },
+    //   {
+    //     _id: new ObjectId("68c13dc4b1ecdd4de5a49c3f"),
+    //     fromUserId: new ObjectId("68c13c241ceb905debf71df1"),
+    //     toUserId: new ObjectId("68c13ccb1ceb905debf71df7"),
+    //   },
+    //   {
+    //     _id: new ObjectId("68c13de3b1ecdd4de5a49c46"),
+    //     fromUserId: new ObjectId("68c13c331ceb905debf71df3"),
+    //     toUserId: new ObjectId("68c13ccb1ceb905debf71df7"),
+    //   },
+    //   {
+    //     _id: new ObjectId("68c13e53b1ecdd4de5a49c52"),
+    //     fromUserId: new ObjectId("68c13ccb1ceb905debf71df7"),
+    //     toUserId: new ObjectId("68c13cb91ceb905debf71df5"),
+    //   },
+    // ];
+
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req.fromUserId.toString());
+      hideUsersFromFeed.add(req.toUserId.toString());
+    });
+    console.log("hideUsersFromFeed", hideUsersFromFeed);
+    // {
+    //     "68c13bcc1ceb905debf71ded",
+    //     "68c13ccb1ceb905debf71df7",
+    //     "68c13c0f1ceb905debf71def",
+    //     "68c13c241ceb905debf71df1",
+    //     "68c13c331ceb905debf71df3",
+    //     "68c13cb91ceb905debf71df5";
+    // }
+
+    const users = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    })
+      .select(USER_SAFE_DATA)
+      .skip(skip) // default value is 0
+      .limit(limit); // default value is taking all the users
+
+    res.send(users);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 });
 
