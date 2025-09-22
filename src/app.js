@@ -2,8 +2,17 @@ const express = require("express");
 require("./config/database");
 const connectDB = require("./config/database");
 const app = express();
-const User = require("./models/user");
 const cookieParser = require("cookie-parser");
+const User = require("./models/user");
+const cors = require("cors");
+require("dotenv").config();
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(cookieParser()); // To parse all cookies
@@ -112,7 +121,7 @@ connectDB()
   .then(() => {
     console.log("Database connection established...");
     // We first established database connection and then start our server
-    app.listen(7777, () => {
+    app.listen(process.env.PORT, () => {
       console.log("Server is successfully listening on port 7777...");
     });
   })
