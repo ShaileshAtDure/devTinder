@@ -15,6 +15,7 @@
   "author": "shailesh sangle",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.893.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
