@@ -5,7 +5,9 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const User = require("./models/user");
 const cors = require("cors");
+
 require("dotenv").config();
+require("./utils/cronjob"); // as soon as application is load then cronjob will run
 
 app.use(
   cors({

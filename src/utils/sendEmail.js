@@ -40,7 +40,7 @@ const createSendEmailCommand = (toAddress, fromAddress, subject, body) => {
   });
 };
 
-const run = async (subject, body) => {
+const run = async (subject, body, toEmailId) => {
   const sendEmailCommand = createSendEmailCommand(
     "sangleshailesh30@gmail.com", //recipient@example.com
     "devTinder@gmail.com", //sender@example.com - this email will be veriefied with aws
