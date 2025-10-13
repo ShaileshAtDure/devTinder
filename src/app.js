@@ -5,6 +5,7 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const User = require("./models/user");
 const cors = require("cors");
+const http = require("http");
 
 require("dotenv").config();
 require("./utils/cronjob"); // as soon as application is load then cronjob will run
@@ -24,6 +25,7 @@ const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
 const paymentRouter = require("./routes/payment");
+const initializeSocket = require("./utils/socket");
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
@@ -121,11 +123,15 @@ app.patch("/user/:userId", async (req, res) => {
   }
 });
 
+const server = http.createServer(app);
+
+initializeSocket(server);
+
 connectDB()
   .then(() => {
     console.log("Database connection established...");
     // We first established database connection and then start our server
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
       console.log("Server is successfully listening on port 7777...");
     });
   })
